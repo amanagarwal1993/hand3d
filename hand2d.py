@@ -1,20 +1,4 @@
-#
-#  ColorHandPose3DNetwork - Network for estimating 3D Hand Pose from a single RGB Image
-#  Copyright (C) 2017  Christian Zimmermann
-#  
-#  This program is free software: you can redistribute it and/or modify
-#  it under the terms of the GNU General Public License as published by
-#  the Free Software Foundation, either version 2 of the License, or
-#  (at your option) any later version.
-#  
-#  This program is distributed in the hope that it will be useful,
-#  but WITHOUT ANY WARRANTY; without even the implied warranty of
-#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#  GNU General Public License for more details.
-#  
-#  You should have received a copy of the GNU General Public License
-#  along with this program.  If not, see <http://www.gnu.org/licenses/>.
-#
+# Let's build a new network combining handsegnet and posenet!
 from __future__ import print_function, unicode_literals
 
 import tensorflow as tf
@@ -24,7 +8,6 @@ import pickle
 from utils.general import *
 
 ops = NetworkOps
-
 
 class ColorHandPose3DNetwork(object):
     """ Network performing 3D pose estimation of a human hand from a single color image. """

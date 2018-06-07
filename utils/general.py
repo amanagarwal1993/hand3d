@@ -21,7 +21,7 @@ import tensorflow as tf
 from tensorflow.python import pywrap_tensorflow
 import numpy as np
 import math
-
+import cv2
 
 class NetworkOps(object):
     """ Operations that are frequently used within networks. """
@@ -217,9 +217,15 @@ def find_max_location(scoremap):
 
         x_vec = tf.reshape(X, [-1])
         y_vec = tf.reshape(Y, [-1])
+        
         scoremap_vec = tf.reshape(scoremap, [s[0], -1])
-        max_ind_vec = tf.cast(tf.argmax(scoremap_vec, dimension=1), tf.int32)
-
+        
+        best = tf.argmax(scoremap_vec, dimension=1)
+        
+        max_ind_vec = tf.cast(best, tf.int32)
+        
+        print ("Max ind vec: ", max_ind_vec[0])
+        
         xy_loc = list()
         for i in range(s[0]):
             x_loc = tf.reshape(x_vec[max_ind_vec[i]], [1])
@@ -232,6 +238,7 @@ def find_max_location(scoremap):
 
 def single_obj_scoremap(scoremap):
     """ Applies my algorithm to figure out the most likely object from a given segmentation scoremap. """
+    print ("Came here!")
     with tf.variable_scope('single_obj_scoremap'):
         filter_size = 21
         s = scoremap.get_shape().as_list()
@@ -240,7 +247,7 @@ def single_obj_scoremap(scoremap):
         scoremap_softmax = tf.nn.softmax(scoremap)  #B, H, W, C --> normalizes across last dimension
         scoremap_fg = tf.reduce_max(scoremap_softmax[:, :, :, 1:], 3) # B, H, W
         detmap_fg = tf.round(scoremap_fg) # B, H, W
-
+        
         # find maximum in the fg scoremap
         max_loc = find_max_location(scoremap_fg)
 
@@ -265,7 +272,7 @@ def single_obj_scoremap(scoremap):
 
         objectmap = tf.stack(objectmap_list)
 
-        return objectmap
+        return objectmap, scoremap_fg
 
 
 def calc_center_bb(binary_class_mask):
@@ -357,7 +364,7 @@ def trafo_coords(keypoints_crop_coords, centers, scale, crop_size):
     return keypoints_coords
 
 
-def plot_hand(coords_hw, axis, color_fixed=None, linewidth='1'):
+def plot_hand(coords_hw, img, color_fixed=None, linewidth='1'):
     """ Plots a hand stick figure into a matplotlib figure. """
     colors = np.array([[0., 0., 0.5],
                        [0., 0., 0.73172906],
@@ -405,15 +412,20 @@ def plot_hand(coords_hw, axis, color_fixed=None, linewidth='1'):
              ((20, 19), colors[17, :]),
              ((19, 18), colors[18, :]),
              ((18, 17), colors[19, :])]
-
+    
     for connection, color in bones:
         coord1 = coords_hw[connection[0], :]
         coord2 = coords_hw[connection[1], :]
         coords = np.stack([coord1, coord2])
-        if color_fixed is None:
-            axis.plot(coords[:, 1], coords[:, 0], color=color, linewidth=linewidth)
-        else:
-            axis.plot(coords[:, 1], coords[:, 0], color_fixed, linewidth=linewidth)
+        
+        cv_color = (list(map(int, color*255)))
+        
+        cv2.line(img, (int(coords[0][1]), int(coords[0][0])), (int(coords[1][1]), int(coords[1][0])), cv_color, 2)
+        
+        #if color_fixed is None:
+            #axis.plot(coords[:, 1], coords[:, 0], color=color, linewidth=linewidth, zorder=2)
+        #else:
+            #axis.plot(coords[:, 1], coords[:, 0], color_fixed, linewidth=linewidth, zorder=2)
 
 
 def plot_hand_3d(coords_xyz, axis, color_fixed=None, linewidth='1'):
