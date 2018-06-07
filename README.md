@@ -1,18 +1,11 @@
-# ColorHandPose3D network
+# Hand3D
 
 ![Teaser](teaser.png)
 
-ColorHandPose3D is a Convolutional Neural Network estimating 3D Hand Pose from a single RGB Image. See the [project page](https://lmb.informatik.uni-freiburg.de/projects/hand3d/) for the dataset used and additional information.
+ColorHandPose3D is a Convolutional Neural Network estimating 3D Hand Pose from a single RGB Image. See the [original project page](https://lmb.informatik.uni-freiburg.de/projects/hand3d/) for the dataset used and additional information.
 
-
-## Usage: Forward pass
-The network ships with a minimal example, that performs a forward pass and shows the predictions.
-
-- Download [data](https://lmb.informatik.uni-freiburg.de/projects/hand3d/ColorHandPose3D_data_v3.zip) and unzip it into the projects root folder (This will create 3 folders: "data", "results" and "weights")
-- *run.py* - Will run a forward pass of the network on the provided examples
-
-You can compare your results to the content of the folder "results", which shows the predictions we get on our system.
-
+### Note!!!
+I, Aman, have made a lot of modifications to this original code to make it closer to a production-ready app. There is still more to be done but the deciding factor here is speed. I've removed computation-hungry and unnecessary steps and also converted it into a live video pipeline. And I've optimized this whole codebase as much as I could, using multi-threading to increase camera FPS. Even after all these steps, on my CPU the inference takes 5 dumb seconds to process every single image.
 
 ## Recommended system
 Recommended system (tested):
@@ -20,12 +13,20 @@ Recommended system (tested):
 - Tensorflow 1.3.0 GPU build with CUDA 8.0.44 and CUDNN 5.1
 - Python 3.5.2
 
-
 Python packages used by the example provided and their recommended version:
 - tensorflow==1.3.0
 - numpy==1.13.0
 - scipy==0.18.1
 - matplotlib==1.5.3
+
+
+## Usage: For live webcam
+
+- Download [data](https://lmb.informatik.uni-freiburg.de/projects/hand3d/ColorHandPose3D_data_v3.zip) and unzip it. Go into this folder and take out two of them, "results" and "weights", out into the main repository.
+- Run the file `run_parallel.py` (the one with multi-threaded webcam pipeline). Wait for the camera feed to open up and then play with your hand gestures. It will not recognize the gesture as such, but it will be able to detect finger joints etc and draw them in a cool way.
+- To end the stream, click on the video feed and hit 'Q' on your keyboard repeatedly until it stops. Not very elegant but that's how it is.
+
+------------ Everything else is from the original documentation, for training etc purposes -------------------
 
 ## Preprocessing for training and evaluation
 In order to use the training and evaluation scripts you need download and preprocess the datasets.
@@ -95,27 +96,3 @@ There are four scripts that evaluate different parts of the architecture:
 3.  eval3d_full.py: Evaluates our full pipeline on 3D keypoint localization from RGB (section 6.2.1, Table 2 of the paper)
 
 This provides the possibility to reproduce results from the paper that are based on the RHD dataset.
-
-
-## License and Citation
-This project is licensed under the terms of the GPL v2 license. By using the software, you are agreeing to the terms of the [license agreement](https://github.com/lmb-freiburg/hand3d/blob/master/LICENSE).
-
-
-Please cite us in your publications if it helps your research:
-
-	@InProceedings{zb2017hand,
-	  author    = {Christian Zimmermann and Thomas Brox},
-	  title     = {Learning to Estimate 3D Hand Pose from Single RGB Images},
-	  booktitle    = "IEEE International Conference on Computer Vision (ICCV)",
-	  year      = {2017},
-	  note         = "https://arxiv.org/abs/1705.01389",
-	  url          = "https://lmb.informatik.uni-freiburg.de/projects/hand3d/"
-	}
-
-
-
-## Known issues
-
-- There is an issue with the results of section 6.1, Table 1 that reports performance of 2D keypoint localization on full scale images (eval2d.py). PoseNet was trained to predict the "palm center", but the evaluation script compares to the "wrist". This results into an systematic error and therefore the reported results are significantly worse than under a correct evaluation setting. Using the correct setting during evaluation improves results approximately by 2-10% (dependent on the measure).
-- The numbers reported for the "Bottleneck" approach in Table 2 of the paper are not correct. The actual result are approx. 8 % worse.
-- There is a minor issue with the first version of RHD. There was a rounding/casting problem, which led to values of the images to be off by one every now and then compared to the version used in the paper. The difference is visually not noticable and not large, but it prevents from reaching the reported numbers exactly.
