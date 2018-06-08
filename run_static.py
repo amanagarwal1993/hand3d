@@ -23,6 +23,7 @@ import scipy.misc
 import cv2
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
+from time import strftime, gmtime
 
 from nets.ColorHandPose3DNetwork import ColorHandPose3DNetwork
 from utils.general import detect_keypoints, trafo_coords, plot_hand, plot_hand_3d
@@ -88,11 +89,13 @@ if __name__ == '__main__':
         coord_hw_crop = detect_keypoints(np.squeeze(keypoints_scoremap_v))
         
         #--- Uncomment these lines
-        #coord_hw = trafo_coords(coord_hw_crop, center_v, scale_v, 256)
+        coord_hw = trafo_coords(coord_hw_crop, center_v, scale_v, 256)
 
-        #plot_hand(coord_hw, image_raw)
+        plot_hand(coord_hw, image_raw)
         
         #image_raw = cv2.cvtColor(image_raw, cv2.COLOR_RGB2BGR)
         
-        #plt.imshow(image_raw)
-        #plt.show()
+        plt.imshow(image_raw)
+        #time_string = strftime("%d-%b-%Y-%H-%M-%S", gmtime())
+        #plt.savefig('results/detected_image' + time_string + '.png')
+        plt.show()
