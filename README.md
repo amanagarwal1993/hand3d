@@ -24,7 +24,9 @@ The function you need will be in the `api.py` file. Make sure this file is run o
 
 How to use this file?
 
-1. Try to use a PNG image, and save it in a folder.
+First, download [data](https://lmb.informatik.uni-freiburg.de/projects/hand3d/ColorHandPose3D_data_v3.zip) and unzip it. Go into this folder and take out two of them, "results" and "weights", out into the main repository.
+
+1. Take the PNG image you want to run detection on, and save it in a folder.
 2. Call the `detect(img_path)` function with, you guessed it, the image path as an argument. It will do inference on the image and save the result as `results/detected_image.png`.
 3. Then you can use this result image whichever way you want!
 
